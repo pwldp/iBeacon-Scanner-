@@ -145,6 +145,8 @@ def parse_events(sock, loop_count=100):
                 #print "advertising report"
                 num_reports = struct.unpack("B", pkt[0])[0]
                 report_pkt_offset = 0
+		if len(pkt) != 41:				# 41 is the standard packet length?
+		    report_pkt_offset = 41 - len(pkt)
                 for i in range(0, num_reports):
 		
 		    if (DEBUG == True):
@@ -156,9 +158,9 @@ def parse_events(sock, loop_count=100):
                     	print "\tMAC address: ", packed_bdaddr_to_string(pkt[report_pkt_offset + 3:report_pkt_offset + 9])
 		    	# commented out - don't know what this byte is.  It's NOT TXPower
                     	txpower, = struct.unpack("b", pkt[report_pkt_offset -2])
-                    	print "\t(Unknown):", txpower
+                    	print "\ttxPower:", txpower
 	
-                    	rssi, = struct.unpack("b", pkt[report_pkt_offset -1])
+                    	rssi, = struct.unpack("b", pkt[ -1])
                     	print "\tRSSI:", rssi
 		    # build the return string
                     Adstring = packed_bdaddr_to_string(pkt[report_pkt_offset + 3:report_pkt_offset + 9])
@@ -171,7 +173,7 @@ def parse_events(sock, loop_count=100):
 		    Adstring += ","
 		    Adstring += "%i" % struct.unpack("b", pkt[report_pkt_offset -2])
 		    Adstring += ","
-		    Adstring += "%i" % struct.unpack("b", pkt[report_pkt_offset -1])
+		    Adstring += "%i" % struct.unpack("b", pkt[ -1])			# RSSI is on the last element
 
 		    #print "\tAdstring=", Adstring
  		    myFullList.append(Adstring)
